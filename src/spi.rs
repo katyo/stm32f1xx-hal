@@ -4,11 +4,12 @@ use core::ptr;
 
 pub use crate::hal::spi::{Mode, Phase, Polarity};
 use nb;
-use crate::pac::{SPI1, SPI2};
+use crate::pac::{SPI1, SPI2, SPI3};
 
 use crate::afio::MAPR;
 use crate::gpio::gpioa::{PA5, PA6, PA7};
 use crate::gpio::gpiob::{PB13, PB14, PB15, PB3, PB4, PB5};
+use crate::gpio::gpioc::{PC10, PC11, PC12};
 use crate::gpio::{Alternate, Floating, Input, PushPull};
 use crate::rcc::{RccBus, Clocks, Enable, Reset};
 use crate::time::Hertz;
@@ -26,10 +27,12 @@ pub enum Error {
     _Extensible,
 }
 
+/// SPI pins configuration
 pub trait Pins<SPI> {
     const REMAP: bool;
 }
 
+/// Using SCK, MISO, MOSI pins for SPI1 (without remapping)
 impl Pins<SPI1>
     for (
         PA5<Alternate<PushPull>>,
@@ -40,6 +43,27 @@ impl Pins<SPI1>
     const REMAP: bool = false;
 }
 
+/// Using only SCK and MOSI pins for SPI1 (without remapping)
+impl Pins<SPI1>
+    for (
+        PA5<Alternate<PushPull>>,
+        PA7<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = false;
+}
+
+/// Using only SCK and MISO pins for SPI1 (without remapping)
+impl Pins<SPI1>
+    for (
+        PA5<Alternate<PushPull>>,
+        PA6<Input<Floating>>,
+    )
+{
+    const REMAP: bool = false;
+}
+
+/// Using SCK, MISO, MOSI pins for SPI1 (with remapping)
 impl Pins<SPI1>
     for (
         PB3<Alternate<PushPull>>,
@@ -50,6 +74,27 @@ impl Pins<SPI1>
     const REMAP: bool = true;
 }
 
+/// Using only SCK and MOSI pins for SPI1 (with remapping)
+impl Pins<SPI1>
+    for (
+        PB3<Alternate<PushPull>>,
+        PB5<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = true;
+}
+
+/// Using only SCK and MISO pins for SPI1 (with remapping)
+impl Pins<SPI1>
+    for (
+        PB3<Alternate<PushPull>>,
+        PB4<Input<Floating>>,
+    )
+{
+    const REMAP: bool = true;
+}
+
+/// Using SCK, MISO, MOSI pins for SPI2
 impl Pins<SPI2>
     for (
         PB13<Alternate<PushPull>>,
@@ -58,6 +103,88 @@ impl Pins<SPI2>
     )
 {
     const REMAP: bool = false;
+}
+
+/// Using only SCK and MOSI pins for SPI2
+impl Pins<SPI2>
+    for (
+        PB13<Alternate<PushPull>>,
+        PB15<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = false;
+}
+
+/// Using only SCK and MISO pins for SPI2
+impl Pins<SPI2>
+    for (
+        PB13<Alternate<PushPull>>,
+        PB14<Input<Floating>>,
+    )
+{
+    const REMAP: bool = false;
+}
+
+/// Using SCK, MISO, MOSI pins for SPI3 (without remapping)
+impl Pins<SPI3>
+    for (
+        PB3<Alternate<PushPull>>,
+        PB4<Input<Floating>>,
+        PB5<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = true;
+}
+
+/// Using only SCK and MOSI pins for SPI3 (without remapping)
+impl Pins<SPI3>
+    for (
+        PB3<Alternate<PushPull>>,
+        PB5<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = false;
+}
+
+/// Using only SCK and MISO pins for SPI3 (without remapping)
+impl Pins<SPI3>
+    for (
+        PB3<Alternate<PushPull>>,
+        PB4<Input<Floating>>,
+    )
+{
+    const REMAP: bool = false;
+}
+
+/// Using SCK, MISO, MOSI pins for SPI3 (with remapping)
+impl Pins<SPI3>
+    for (
+        PC10<Alternate<PushPull>>,
+        PC11<Input<Floating>>,
+        PC12<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = true;
+}
+
+/// Using only SCK and MOSI pins for SPI3 (with remapping)
+impl Pins<SPI3>
+    for (
+        PC10<Alternate<PushPull>>,
+        PC12<Alternate<PushPull>>,
+    )
+{
+    const REMAP: bool = true;
+}
+
+/// Using only SCK and MISO pins for SPI3 (with remapping)
+impl Pins<SPI3>
+    for (
+        PC10<Alternate<PushPull>>,
+        PC11<Input<Floating>>,
+    )
+{
+    const REMAP: bool = true;
 }
 
 pub struct Spi<SPI, PINS> {
